@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital HHHA - Portal de Pacientes</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; color: #333; }
+        header { background: #003366; color: white; padding: 20px; text-align: center; }
+        header h1 { font-size: 24px; }
+        header p { font-size: 14px; margin-top: 5px; opacity: 0.8; }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { color: #003366; margin-bottom: 15px; border-bottom: 2px solid #003366; padding-bottom: 8px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        button { background: #003366; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        button:hover { background: #00509e; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #003366; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .badge-lab { background: #d4edda; color: #155724; }
+        .badge-img { background: #cce5ff; color: #004085; }
+        #mensaje { padding: 10px; border-radius: 5px; margin-top: 10px; display: none; }
+        .ok { background: #d4edda; color: #155724; }
+        .err { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏥 Hospital Dr. Hernán Henríquez Aravena</h1>
+        <p>Portal Digital de Resultados para Pacientes</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>📤 Subir Resultado</h2>
+            <input type="text" id="nombre" placeholder="Nombre del paciente">
+            <input type="text" id="rut" placeholder="RUT (ej: 12.345.678-9)">
+            <select id="tipo">
+                <option value="laboratorio">📋 Resultado de Laboratorio (PDF)</option>
+                <option value="imagenologia">🩻 Imagen Médica</option>
+            </select>
+            <input type="file" id="archivo">
+            <button onclick="subirArchivo()">Subir al Almacenamiento Cloud</button>
+            <div id="mensaje"></div>
+        </div>
+
+        <div class="card">
+            <h2>📋 Registros de Pacientes</h2>
+            <button onclick="cargarPacientes()">🔄 Actualizar Lista</button>
+            <table>
+                <thead>
+                    <tr><th>Nombre</th><th>RUT</th><th>Tipo</th><th>Archivo</th></tr>
+                </thead>
+                <tbody id="tablaPacientes">
+                    <tr><td colspan="4" style="text-align:center">Haz clic en Actualizar Lista</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API = `http://${window.location.hostname}/api`;
+
+        async function subirArchivo() {
+            const nombre = document.getElementById('nombre').value;
+            const rut = document.getElementById('rut').value;
+            const tipo = document.getElementById('tipo').value;
+            const archivo = document.getElementById('archivo').files[0];
+            const msg = document.getElementById('mensaje');
+
+            if (!nombre || !rut || !archivo) {
+                msg.className = 'err'; msg.style.display = 'block';
+                msg.textContent = '⚠️ Completa todos los campos.'; return;
+            }
+
+            const form = new FormData();
+            form.append('file', archivo);
+
+            const res = await fetch(`${API}/subir/${tipo}?nombre=${encodeURIComponent(nombre)}&rut=${encodeURIComponent(rut)}`, {
+                method: 'POST', body: form
+            });
+            const data = await res.json();
+            msg.className = 'ok'; msg.style.display = 'block';
+            msg.textContent = '✅ ' + data.mensaje;
+            cargarPacientes();
+        }
+
+        async function cargarPacientes() {
+            const res = await fetch(`${API}/pacientes`);
+            const data = await res.json();
+            const tbody = document.getElementById('tablaPacientes');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Sin registros aún</td></tr>'; return;
+            }
+            tbody.innerHTML = data.map(p => `
+                <tr>
+                    <td>${p.nombre}</td>
+                    <td>${p.rut}</td>
+                    <td><span class="badge ${p.tipo === 'laboratorio' ? 'badge-lab' : 'badge-img'}">${p.tipo}</span></td>
+                    <td>${p.archivo}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

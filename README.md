@@ -1,5 +1,6 @@
 ----------------------------------------------------------------
 MANUAL DE DESPLIEGUE — HHHA Multi Cloud
+
 ----------------------------------------------------------------
 
 REQUISITOS PREVIOS
@@ -60,6 +61,7 @@ Región: Brazil South | Resource Group: hhha-rg
 
 ----------------------------------------------------------------
 NOTAS IMPORTANTES
+
 ----------------------------------------------------------------
 - La IP pública cambia cada vez que se reinicia el laboratorio AWS.
 - Los archivos del proyecto están en /home/ubuntu/hhha-app/

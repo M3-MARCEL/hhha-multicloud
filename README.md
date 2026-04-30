@@ -1,6 +1,6 @@
-================================================================
+----------------------------------------------------------------
 MANUAL DE DESPLIEGUE — HHHA Multi Cloud
-================================================================
+----------------------------------------------------------------
 
 REQUISITOS PREVIOS
 ------------------
@@ -58,12 +58,10 @@ Storage Account: hhhastoragecloud
 Containers: laboratorio | imagenologia
 Región: Brazil South | Resource Group: hhha-rg
 
-================================================================
+----------------------------------------------------------------
 NOTAS IMPORTANTES
-================================================================
+----------------------------------------------------------------
 - La IP pública cambia cada vez que se reinicia el laboratorio AWS.
 - Los archivos del proyecto están en /home/ubuntu/hhha-app/
 - Los datos de PostgreSQL persisten aunque se detenga Docker.
 - Las credenciales de Azure están en /home/ubuntu/hhha-app/.env
-
-================================================================
